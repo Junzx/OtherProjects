@@ -1,0 +1,3 @@
+
+F:\Data\small\Baby_5.json
+rating: 0.933071494491	polarity: 0.147238017658

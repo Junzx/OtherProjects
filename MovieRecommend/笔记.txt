@@ -1,0 +1,41 @@
+users.dat
+UserID::Gender::Age::Occupation::Zip-code
+movies.dat
+MovieID::Title::Genres
+ratings.dat
+UserID::MovieID::Rating::Timestamp
+
+Class User
+
+- UserID
+- Gender
+- Age
+- Occupation
+- RatingData    # list，内容是评价过的图书，rating object
+
+
+Class Rating
+
+- UserId
+- MovieId
+- Rating
+
+Class Movie
+
+- MovieID
+- Title
+- Genres
+
+Class DataSet
+
+- lst_users     # 放user对象的list
+- lst_movies    # 放movie对象的list
+- lst_rating    # 放rating对象的list
+- dic_ratings   # id: user id, value:list of rating object
+- dic_average   # 放每个user打分的平均值，id:userid ,value:average
+- load_file()   # 加载文件
+
+
+
+denominator 分母
+numerator   分子
