@@ -26,38 +26,28 @@ class One_Line(object):
 
 
 class Data(object):
-    def __init__(self, read_handle, write_handle, input_file_path):
+    def __init__(self, input_file_path):
         self.input_file_path = input_file_path
         
-        # self.read_handle = xlrd.open_workbook(self.input_file_path,'r')
-        self.read_handle = read_handle
-        self.write_handle = write_handle
+        self.read_handle = xlrd.open_workbook(self.input_file_path,'r')
+        self.my_table = self.read_handle.sheets()[0] # sheet1
+
+        self.write_handle = copy(self.read_handle)
+        self.write_table = self.write_handle.get_sheet(0)
+
+        self.dic_data = {}  # 只记录第一个订单出现的位置
+        self.lst_data = []  # 所有的数据 放在一个list中 元素是obj
         
-        output_file = 'Result_' + self.input_file_path[:-1]
-        
-        for sheet_index in range(len(self.read_handle.sheets())):
-            print sheet_index
-            self.my_table = self.read_handle.sheets()[sheet_index] # sheet1
-            self.write_table = self.write_handle.get_sheet(sheet_index)
+        self.dic_order_cost = {}    # 每单总额
+        self.dic_order_pay = {}     # 每单用户支付
 
-            self.dic_data = {}  # 只记录第一个订单出现的位置
-            self.lst_data = []  # 所有的数据 放在一个list中 元素是obj
-            
-            self.dic_order_cost = {}    # 每单总额
-            self.dic_order_pay = {}     # 每单用户支付
-
-            self.__load_file()  # 加载数据
-            
-            self.task_profit(output_file)
-        self.save_file(output_file)
-
-    def sys_run(self):
-        output_file = 'Result_' + self.input_file_path[:-1]
-        self.task_profit(output_file)
+        self.__load_file()  # 加载数据
 
     def __load_file(self):
         
+
         rows = self.my_table.nrows   # 行数
+        
         for index in range(rows):
             if index == 0:  # 第一行是说明 略过
                 continue
@@ -76,11 +66,12 @@ class Data(object):
 
         print '\n\t\t\t载入数据完成！'.decode('UTF-8').encode('CP936'),
 
-    def save_file(self,output_file_path):
+    def __save_file(self,output_file_path):
         '''
         保存文件
         '''
         self.write_handle.save(output_file_path)  
+
 
     def task_total_cost(self,output_file_path):
         '''
@@ -139,7 +130,7 @@ class Data(object):
                 self.write_table.write(this_obj.index,14,unicode(res))  # 利润
                 self.write_table.write(this_obj.index,17,unicode(self.dic_order_pay[order_id])) # 支付总额
 
-        # self.save_file(output_file_path)  # 必须调用这个才能保存
+        self.__save_file(output_file_path)  # 必须调用这个才能保存
         print '计算订单利润...完成！'.decode('UTF-8').encode('CP936')
 
 def print_decode(mystr):
@@ -148,19 +139,11 @@ def print_decode(mystr):
 def run_result(input_file):
     # 运行程序
     print '\n\n\t\t\t正在处理：'.decode('UTF-8').encode('CP936')+input_file
+    data = Data(input_file)
+    output_file_path = 'Result_'+input_file[:-1]
 
+    data.task_profit(output_file_path)
 
-    read_handle = xlrd.open_workbook(input_file,'r')
-    write_handle = copy(read_handle)
-
-    data = Data(read_handle, write_handle, input_file)
-    # output_file = 'Result_' + self.input_file_path[:-1]
-    # data.task_profit(output_file)
-    # data.save_file(output_file)
-
-    # for i in range(4):
-    #     data = Data(input_file, i)
-    #     data.sys_run()
 
 def menu():
     print '-'*80,'\n'
@@ -193,7 +176,7 @@ def menu():
     # 运行程序
     run_result(input_file)
 
-    menu_order = raw_input('\n\n\t\t\t如果需要继续处理请输入 “1” , 退出请敲回车。'.decode('UTF-8').encode('CP936'))
+    menu_order = raw_input('\n\n\t\t\t如果需要继续处理请输入 “1” , 退出请随意敲。'.decode('UTF-8').encode('CP936'))
     if menu_order == '1':
         menu()
 
